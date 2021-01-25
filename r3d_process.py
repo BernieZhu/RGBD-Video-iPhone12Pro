@@ -30,6 +30,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--depth', action='store_const', const='depth')
     parser.add_argument('--video', action='store_const', const='video')
+    parser.add_argument('--quiet', action='store_const', const='quiet')
     args = parser.parse_args()
 
     # unzip r3d
@@ -47,12 +48,12 @@ def main():
                     if(j[-6:] == '.depth'):
                         depth = os.path.join(rgbd_folder, j)
                         os.system('lzfse -decode -i '+depth+' -o '+depth+'_new')
-                print('Depth data saved at '+rgbd_folder)
+                if (not args.quiet): print('Depth data saved at '+rgbd_folder)
                     
             if(args.video):
                 # rgb video
                 get_video(folder, 'jpg')
-                print('RGB video saved at '+folder)
+                if (not args.quiet): print('RGB video saved at '+folder)
                 if(args.depth):
                     # save depth maps
                     for j in os.listdir(rgbd_folder):
@@ -60,11 +61,11 @@ def main():
                             depth = os.path.join(rgbd_folder, j)
                             depthmap = depth2image(depth, 256, 192)
                             plt.imsave(depth+'.jpg', depthmap, format='jpg', cmap=plt.cm.gray)
-                    print('Depth maps saved at '+rgbd_folder)
+                    if (not args.quiet): print('Depth maps saved at '+rgbd_folder)
 
                     # depth video
                     get_video(folder, 'depth_new')
-                    print('Depth video saved at '+folder)
+                    if (not args.quiet): print('Depth video saved at '+folder)
                 else:
                     continue
         
