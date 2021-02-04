@@ -60,7 +60,7 @@ def main():
                         if(j[-4:] == '_new'):
                             depth = os.path.join(rgbd_folder, j)
                             depthmap = depth2image(depth, 256, 192)
-                            plt.imsave(depth+'.jpg', depthmap, format='jpg', cmap=plt.cm.gray)
+                            plt.imsave(depth+'.jpg', depthmap, format='jpg', cmap=plt.cm.jet)
                     if (not args.quiet): print('Depth maps saved at '+rgbd_folder)
 
                     # depth video
