@@ -57,6 +57,8 @@ def main():
         folder = os.path.join(args.path, i)
         if (os.path.isdir(folder)):
             rgbd_folder = os.path.join(folder, 'rgbd')
+            if(not os.path.exists(rgbd_folder)):
+                continue
             if(args.depth):
                 for j in os.listdir(rgbd_folder):
                     if(j[-6:] == '.depth'):
