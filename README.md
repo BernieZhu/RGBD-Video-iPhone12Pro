@@ -7,18 +7,18 @@
 Library - Export - r3d - Share  
 
 ## Process the Videos
-python r3d_process.py \[options\]
---path: Folder that contains r3d files.  
---depth: Decode depth file.  
+python r3d_process.py \[options\]  
+--path: Path to the folder that contains r3d files.  
+--depth: Decode depth file and save depth image.  
 --video: Save RGB and depth video.  
 --quiet: Disable logs.  
   
 ## Structure  
 *.mp4 is for visualization. Use the data in the rgbd folder instead.  
-metadata: Binary file. K is the intrinsic matrix [fx, 0, 0, s, fy, 0, x0, y0, 1].  
+metadata: Binary file. K is the intrinsic matrix in order [fx, 0, 0, s, fy, 0, x0, y0, 1].  
 
 Folder: rgbd  
-frame#.jpg: 256\*192 or 960\*720 rgb.  
+frame#.jpg: 256\*192 or 960\*720 rgb. Modify the numbers before you run the code.  
 frame#.depth: Original depth (lzfse).  
 frame#.depth_new: Depth map (float32), 256\*192. Each value is the actual depth value in meters. USE THIS ONE.  
 frame#.depth_new.jpg: Depth map for visualization.  
