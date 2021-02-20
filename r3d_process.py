@@ -13,6 +13,7 @@ def load_depth(filepath):
         decompressed_bytes = liblzfse.decompress(raw_bytes)
         depth_img = np.frombuffer(decompressed_bytes, dtype=np.float32)
     depth_img = depth_img.reshape((640, 480))
+    # depth_img = depth_img.reshape((256, 192))
     return depth_img
 
 def depth2image(filename, nx, ny):
@@ -27,10 +28,13 @@ def depth2image(filename, nx, ny):
     return img
 
 def get_video(folder, typename):
-    if (typename == 'depth' or typename == 'depth_new'):
-        typename = 'depth.jpg'
-    in_folder = os.path.join(folder, 'rgbd')
-    out = os.path.join(folder, typename+'.mp4')
+    if (typename == 'depth'):
+        typename = 'png'
+        in_folder = os.path.join(folder, 'depth')
+        out = os.path.join(folder, 'depth.mp4')
+    else:
+        in_folder = os.path.join(folder, 'color')
+        out = os.path.join(folder, 'color.mp4')
     os.system('ffmpeg -loglevel quiet -threads 2 -y -r 30 -i '+in_folder+'/%d.'+typename+' '+out)
 
 def main():
@@ -52,6 +56,7 @@ def main():
         if(r3d[-4:] == '.r3d'):
             os.system('unzip -q -n '+os.path.join(args.path, r3d)+' -d '+args.path+'/'+r3d[:-4])
             os.system('rm '+os.path.join(args.path, r3d[:-4])+'/sound.aac')
+            os.system('rm '+os.path.join(args.path, r3d[:-4])+'/icon')
     # decoding depth files
     for i in os.listdir(args.path):
         folder = os.path.join(args.path, i)
@@ -66,8 +71,10 @@ def main():
                         os.system('lzfse -decode -i '+depth_path+' -o '+depth_path+'_new')
                         if(args.depth):
                             depth_img = load_depth(depth_path)
-                            cv2.imwrite(depth_path+'.jpg', depth_img*255)
-                if (not args.quiet): print('Depth data saved at '+rgbd_folder)
+                            cv2.imwrite(depth_path[:-6]+'.png', depth_img*255)
+                os.system('mkdir %s/depth; mv %s/rgbd/*.png %s/depth'%(folder, folder, folder))
+                os.system('mkdir %s/color; mv %s/rgbd/*.jpg %s/color'%(folder, folder, folder))
+                if (not args.quiet): print('Depth data saved at %s/depth'%(folder))
                     
             if(args.video):
                 # rgb video
@@ -75,7 +82,7 @@ def main():
                 if (not args.quiet): print('RGB video saved at '+folder)
                 if(args.depth):
                     # depth video
-                    get_video(folder, 'depth_new')
+                    get_video(folder, 'depth')
                     if (not args.quiet): print('Depth video saved at '+folder)
                 else:
                     continue
