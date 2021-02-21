@@ -6,6 +6,7 @@ import os
 import sys
 import argparse
 import liblzfse
+import open3d as o3d
 
 def load_depth(filepath):
     with open(filepath, 'rb') as depth_fh:
@@ -13,7 +14,8 @@ def load_depth(filepath):
         decompressed_bytes = liblzfse.decompress(raw_bytes)
         depth_img = np.frombuffer(decompressed_bytes, dtype=np.float32)
     depth_img = depth_img.reshape((640, 480))
-    # depth_img = depth_img.reshape((256, 192))
+    depth_img = depth_img * 1000
+    depth_img = depth_img.astype(dtype= np.uint16)
     return depth_img
 
 def depth2image(filename, nx, ny):
@@ -35,7 +37,7 @@ def get_video(folder, typename):
     else:
         in_folder = os.path.join(folder, 'color')
         out = os.path.join(folder, 'color.mp4')
-    os.system('ffmpeg -loglevel quiet -threads 2 -y -r 30 -i '+in_folder+'/%d.'+typename+' '+out)
+    os.system('ffmpeg -loglevel quiet -threads 2 -y -r 30 -i %s/%%d.%s %s'%(in_folder, typename, out))
 
 def main():
     parser = argparse.ArgumentParser()
@@ -68,10 +70,13 @@ def main():
                 for j in os.listdir(rgbd_folder):
                     if(j[-6:] == '.depth'):
                         depth_path = os.path.join(rgbd_folder, j)
-                        os.system('lzfse -decode -i '+depth_path+' -o '+depth_path+'_new')
+                        # os.system('lzfse -decode -i '+depth_path+' -o '+depth_path+'_new')
                         if(args.depth):
                             depth_img = load_depth(depth_path)
-                            cv2.imwrite(depth_path[:-6]+'.png', depth_img*255)
+                            # cv2.imwrite(depth_path[:-6]+'.png', depth_img)
+                            # o3d.io.write_image(depth_path[:-6]+'.png', depth_img)
+                            depth_img = o3d.geometry.Image(depth_img)
+                            o3d.io.write_image(depth_path[:-6]+'.png', depth_img)
                 os.system('mkdir %s/depth; mv %s/rgbd/*.png %s/depth'%(folder, folder, folder))
                 os.system('mkdir %s/color; mv %s/rgbd/*.jpg %s/color'%(folder, folder, folder))
                 if (not args.quiet): print('Depth data saved at %s/depth'%(folder))
