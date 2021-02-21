@@ -18,7 +18,8 @@ python r3d_process.py \[options\]
 |  :-:  |  :-:  |  :-:  |
 | iPhone LiDAR | 720\*920 | 192\*256 |
 | iPhone TrueDepth | 480\*640 | 480\*640 |
-| RealSense | 480\*640 | 480\*640 |
+| RealSense | 480\*640 | 480\*640 |  
+
 Be sure to modify the resolution in the code before you run it.  
 
 ## Structure  
